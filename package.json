@@ -1,0 +1,38 @@
+{
+  "name": "hot-plate.js",
+  "version": "1.0.0",
+  "description": "Hot plate problem - solution and demo.",
+  "main": "src/js/core.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "async": "^1.0.0",
+    "average": "^0.0.1",
+    "chroma-js": "^0.7.2",
+    "grunt-contrib-copy": "^0.8.0",
+    "is-even": "^0.1.1",
+    "is-number": "^2.0.2",
+    "jquery": "^2.1.4",
+    "lodash": "^3.9.1"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^3.8.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "load-grunt-tasks": "^3.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AndersDJohnson/hot-plate.js.git"
+  },
+  "author": "Anders D. Johnson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AndersDJohnson/hot-plate.js/issues"
+  },
+  "homepage": "https://github.com/AndersDJohnson/hot-plate.js"
+}
