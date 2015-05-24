@@ -26528,12 +26528,9 @@ module.exports = function (options) {
 
   var plate = options.plate;
   var $gridContainer = $(options.gridContainer);
-  var $stepsContainer = $(options.stepsContainer);
+  var onTurn = options.onTurn;
 
-  var stepTime = options.stepTime || 100;
-
-  var $steps = $('<div>');
-  $stepsContainer.append($steps);
+  var turnTime = options.turnTime || 100;
 
 
   var div = function () {
@@ -26565,11 +26562,11 @@ module.exports = function (options) {
   var gridEls = toEls(plate);
   var renderEl = render(gridEls);
 
-  $gridContainer.append(renderEl);
+  $gridContainer.html(renderEl);
 
   var scale = chroma.scale(['blue', 'red']);
 
-  var update = function (state) {
+  var update = function (state, cb) {
     plate.grid.forEach(function (row, y) {
       row.forEach(function (val, x) {
         var el = gridEls[y][x];
@@ -26583,17 +26580,32 @@ module.exports = function (options) {
       });
     });
 
-    $steps.text(state.moves);
+    if (onTurn) {
+      onTurn(state, cb);
+    }
+    else {
+      cb();
+    }
   };
 
+  var stop = false;
+
   plate.run(function (state, cb) {
-    // console.log('step');
-    update(state);
-    setTimeout(cb, stepTime);
+    if (stop) return;
+
+    update(state, function () {
+      setTimeout(cb, turnTime);
+    });
   }, function (state) {
     // console.log('done', plate, state);
   });
 
+
+  return {
+    stop: function () {
+      stop = true;
+    }
+  };
 };
 
 },{"./core":18,"chroma-js":3,"jquery":14,"lodash":15}],17:[function(require,module,exports){
@@ -26601,12 +26613,30 @@ var core = require('./core');
 var browserCore = require('./browser-core');
 var $ = require('jquery');
 
-browserCore({
-  plate: new core.Plate(16, 16),
-  gridContainer: $('#grid-container'),
-  stepsContainer: $('#steps-container'),
-  stepTime: 50
-});
+var $turns = $('#turns');
+var $diff = $('#diff');
+
+var instance;
+
+var run = function () {
+  if (instance) {
+    instance.stop();
+  }
+  instance = browserCore({
+    plate: new core.Plate(16, 16),
+    gridContainer: $('#grid-container'),
+    turnTime: 50,
+    onTurn: function (state, cb) {
+      $turns.text(state.turns);
+      $diff.text(state.diffMax);
+      cb();
+    }
+  });
+};
+
+run();
+
+$('#run').click(run);
 
 },{"./browser-core":16,"./core":18,"jquery":14}],18:[function(require,module,exports){
 /**
@@ -26738,14 +26768,14 @@ Plate.diff = function (prev, next) {
 };
 
 
-Plate.prototype.step = function (state) {
+Plate.prototype.turn = function (state) {
   state = state || {
-    moves: 0,
+    turns: 0,
     diffMax: Infinity
   };
   var thisDiff, thisDiffMax;
   var diffMax = state.diffMax;
-  var moves = state.moves;
+  var turns = state.turns;
   var prev = _.cloneDeep(this);
   this.heat();
   var thisDiff = Plate.diff(prev, this);
@@ -26757,9 +26787,9 @@ Plate.prototype.step = function (state) {
     .max()
     .value();
   diffMax = Math.min(thisDiffMax, diffMax);
-  ++moves;
+  ++turns;
   return {
-    moves: moves,
+    turns: turns,
     diffMax: diffMax
   };
 };
@@ -26774,7 +26804,7 @@ Plate.prototype.run = function (hook, done) {
   var plate = this;
   var state;
   async.doWhilst(function (callback) {
-    state = plate.step(state);
+    state = plate.turn(state);
     if (hook) { hook(state, callback); }
     else { callback(); }
   }, function () {
