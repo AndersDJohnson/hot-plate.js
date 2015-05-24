@@ -44,7 +44,7 @@ module.exports = function (options) {
   var gridEls = toEls(plate);
   var renderEl = render(gridEls);
 
-  $gridContainer.append(renderEl);
+  $gridContainer.html(renderEl);
 
   var scale = chroma.scale(['blue', 'red']);
 
@@ -70,8 +70,11 @@ module.exports = function (options) {
     }
   };
 
+  var stop = false;
+
   plate.run(function (state, cb) {
-    // console.log('turn');
+    if (stop) return;
+
     update(state, function () {
       setTimeout(cb, turnTime);
     });
@@ -79,4 +82,10 @@ module.exports = function (options) {
     // console.log('done', plate, state);
   });
 
+
+  return {
+    stop: function () {
+      stop = true;
+    }
+  };
 };
