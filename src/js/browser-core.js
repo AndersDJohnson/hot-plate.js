@@ -10,12 +10,9 @@ module.exports = function (options) {
 
   var plate = options.plate;
   var $gridContainer = $(options.gridContainer);
-  var $stepsContainer = $(options.stepsContainer);
+  var onTurn = options.onTurn;
 
-  var stepTime = options.stepTime || 100;
-
-  var $steps = $('<div>');
-  $stepsContainer.append($steps);
+  var turnTime = options.turnTime || 100;
 
 
   var div = function () {
@@ -51,7 +48,7 @@ module.exports = function (options) {
 
   var scale = chroma.scale(['blue', 'red']);
 
-  var update = function (state) {
+  var update = function (state, cb) {
     plate.grid.forEach(function (row, y) {
       row.forEach(function (val, x) {
         var el = gridEls[y][x];
@@ -65,13 +62,19 @@ module.exports = function (options) {
       });
     });
 
-    $steps.text(state.moves);
+    if (onTurn) {
+      onTurn(state, cb);
+    }
+    else {
+      cb();
+    }
   };
 
   plate.run(function (state, cb) {
-    // console.log('step');
-    update(state);
-    setTimeout(cb, stepTime);
+    // console.log('turn');
+    update(state, function () {
+      setTimeout(cb, turnTime);
+    });
   }, function (state) {
     // console.log('done', plate, state);
   });

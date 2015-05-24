@@ -127,14 +127,14 @@ Plate.diff = function (prev, next) {
 };
 
 
-Plate.prototype.step = function (state) {
+Plate.prototype.turn = function (state) {
   state = state || {
-    moves: 0,
+    turns: 0,
     diffMax: Infinity
   };
   var thisDiff, thisDiffMax;
   var diffMax = state.diffMax;
-  var moves = state.moves;
+  var turns = state.turns;
   var prev = _.cloneDeep(this);
   this.heat();
   var thisDiff = Plate.diff(prev, this);
@@ -146,9 +146,9 @@ Plate.prototype.step = function (state) {
     .max()
     .value();
   diffMax = Math.min(thisDiffMax, diffMax);
-  ++moves;
+  ++turns;
   return {
-    moves: moves,
+    turns: turns,
     diffMax: diffMax
   };
 };
@@ -163,7 +163,7 @@ Plate.prototype.run = function (hook, done) {
   var plate = this;
   var state;
   async.doWhilst(function (callback) {
-    state = plate.step(state);
+    state = plate.turn(state);
     if (hook) { hook(state, callback); }
     else { callback(); }
   }, function () {
