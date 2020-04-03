@@ -13,7 +13,7 @@
     "grunt-contrib-copy": "^0.8.0",
     "is-even": "^0.1.1",
     "is-number": "^2.0.2",
-    "jquery": "^2.1.4",
+    "jquery": "^3.4.1",
     "lodash": "^3.9.1"
   },
   "devDependencies": {
